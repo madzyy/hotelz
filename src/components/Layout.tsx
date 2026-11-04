@@ -20,8 +20,8 @@ export function Layout() {
       <header className="topbar">
         <div className="bar">
           <NavLink to="/" className="brand" end>
-            <span className="mark">H</span>
-            Hotelz
+            <span className="mark">K</span>
+            Kipling Court
           </NavLink>
           <nav className="desk-nav">
             <NavLink to="/" end>
@@ -41,8 +41,8 @@ export function Layout() {
       </header>
       <Outlet />
       <footer className="site-footer">
-        <strong>Hotelz</strong>
-        <p>Direct rates for the group’s hotels and lodges. No booking commission on the room.</p>
+        <strong>Kipling Court</strong>
+        <p>Direct bookings for the Fairview apartment. Apartment 3, Ituna Road, Lusaka.</p>
       </footer>
       <nav className="tabbar">
         <NavLink to="/" end>

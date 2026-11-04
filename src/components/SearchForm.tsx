@@ -33,7 +33,7 @@ export function SearchForm({ initial, compact = false }: Props) {
         <span>Where</span>
         <input
           value={query.destination}
-          placeholder="Search hotels and lodges"
+          placeholder="Fairview, Lusaka"
           onChange={(event) => update('destination', event.target.value)}
         />
       </label>
@@ -70,7 +70,7 @@ export function SearchForm({ initial, compact = false }: Props) {
           <button
             type="button"
             aria-label="More guests"
-            onClick={() => update('guests', Math.min(8, query.guests + 1))}
+            onClick={() => update('guests', Math.min(4, query.guests + 1))}
           >
             +
           </button>

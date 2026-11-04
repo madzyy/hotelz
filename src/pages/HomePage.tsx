@@ -1,47 +1,45 @@
 import { Link } from 'react-router-dom'
 import { SearchForm } from '../components/SearchForm'
-import { properties, fromPrice } from '../data/properties'
+import { fromPrice, properties } from '../data/properties'
 import { defaultStay, formatMoney, searchParams } from '../lib/stay'
 
 export function HomePage() {
   const stay = defaultStay()
+  const home = properties[0]
 
   return (
     <main className="home">
       <section className="home-intro">
         <div className="hero-copy">
-          <p className="eyebrow">Book direct</p>
-          <h1>Stay with the group. Skip the booking fee.</h1>
-          <p>Search the hotels and lodges we operate, then reserve at the house rate.</p>
+          <p className="eyebrow">Fairview, Lusaka</p>
+          <h1>Kipling Court. The apartment, booked direct.</h1>
+          <p>Two bedrooms on Ituna Road. Kitchen, balcony, parking, and the house rate.</p>
         </div>
         <figure className="hero-frame">
-          <img
-            src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=2000&q=80"
-            alt="Hotel pool and rooms in warm evening light"
-          />
+          <img src={home.images[0]} alt="Kipling Court in Fairview, Lusaka" />
         </figure>
       </section>
       <SearchForm initial={stay} />
 
       <section className="section">
         <div className="section-head">
-          <h2>Places we host</h2>
+          <h2>Inside the apartment</h2>
         </div>
         <div className="place-row">
-          {properties.map((property) => (
+          {home.images.slice(1, 7).map((image, index) => (
             <Link
-              key={property.id}
+              key={image}
               className="place"
-              to={`/search?${searchParams({ ...stay, destination: property.city }).toString()}`}
+              to={`/stay/${home.id}?${searchParams(stay).toString()}`}
             >
-              <img src={property.images[0]} alt="" />
-              <span>{property.city}</span>
+              <img src={image} alt="" />
+              <span>{['Living room', 'Bedroom', 'Kitchen', 'Bathroom', 'Balcony', 'Details'][index]}</span>
             </Link>
           ))}
         </div>
 
         <div className="section-head">
-          <h2>Hotels and lodges</h2>
+          <h2>The stay</h2>
           <Link to="/search">See all</Link>
         </div>
         <div className="card-grid">

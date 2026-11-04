@@ -8,7 +8,6 @@ import { formatMoney, readSearch, searchParams } from '../lib/stay'
 export function SearchPage() {
   const [params] = useSearchParams()
   const stay = readSearch(params)
-  const [kind, setKind] = useState<'all' | 'hotel' | 'lodge'>('all')
   const [maxPrice, setMaxPrice] = useState(450)
   const [mapOpen, setMapOpen] = useState(false)
 
@@ -18,25 +17,15 @@ export function SearchPage() {
       const text = `${property.name} ${property.city} ${property.area}`.toLowerCase()
       const matchesPlace = !needle || text.includes(needle)
       const fitsGuests = property.rooms.some((room) => room.sleeps >= stay.guests && room.price <= maxPrice)
-      const matchesKind = kind === 'all' || property.kind === kind
-      return matchesPlace && fitsGuests && matchesKind
+      return matchesPlace && fitsGuests
     })
-  }, [stay.destination, stay.guests, kind, maxPrice])
+  }, [stay.destination, stay.guests, maxPrice])
 
   return (
     <main className={mapOpen ? 'search-page map-open' : 'search-page'}>
       <SearchForm key={params.toString()} initial={stay} compact />
       <div className="filters">
-        {(['all', 'hotel', 'lodge'] as const).map((value) => (
-          <button
-            key={value}
-            type="button"
-            className={kind === value ? 'chip on' : 'chip'}
-            onClick={() => setKind(value)}
-          >
-            {value === 'all' ? 'All stays' : value === 'hotel' ? 'Hotels' : 'Lodges'}
-          </button>
-        ))}
+        <span className="chip on">Apartment · sleeps 4</span>
         <label className="price-filter">
           Up to {formatMoney(maxPrice)}
           <input
