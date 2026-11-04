@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { PropertyMap } from '../components/PropertyMap'
 import { getProperty } from '../data/properties'
-import { formatMoney, nightsBetween, readSearch, searchParams } from '../lib/stay'
+import { formatDate, formatMoney, nightsBetween, readSearch, searchParams } from '../lib/stay'
 
 export function StayPage() {
   const { id } = useParams()
@@ -22,71 +22,104 @@ export function StayPage() {
 
   const nights = nightsBetween(stay.checkIn, stay.checkOut)
   const rooms = property.rooms.filter((room) => room.sleeps >= stay.guests)
+  const from = Math.min(...property.rooms.map((room) => room.price))
 
   return (
     <main className="stay">
-      <p className="eyebrow">
-        {property.kind} · {property.area}
-      </p>
-      <h1>{property.name}</h1>
-      <p className="meta">
-        {property.rating.toFixed(1)} from {property.reviews} guest reviews · {property.city}
-      </p>
+      <Link className="back" to={`/search?${searchParams(stay).toString()}`}>
+        ← Stays
+      </Link>
+      <div className="stay-title">
+        <div>
+          <h1>{property.name}</h1>
+          <p className="muted">
+            ★ {property.rating.toFixed(1)} · {property.reviews} reviews · {property.area}
+          </p>
+        </div>
+        <p className="pill">{property.kind}</p>
+      </div>
 
       <div className="gallery">
-        <img src={property.images[photo]} alt="" />
-        <div>
+        <div className="film">
+          {property.images.map((image) => (
+            <img key={image} src={image} alt="" />
+          ))}
+        </div>
+        <div className="thumbs">
           {property.images.map((image, index) => (
-            <button key={image} type="button" onClick={() => setPhoto(index)} aria-label={`Photo ${index + 1}`}>
+            <button
+              key={image}
+              type="button"
+              className={photo === index ? 'on' : ''}
+              onClick={() => setPhoto(index)}
+              aria-label={`Photo ${index + 1}`}
+            >
               <img src={image} alt="" />
             </button>
           ))}
         </div>
+        <img className="hero-photo" src={property.images[photo]} alt="" />
       </div>
 
       <div className="stay-layout">
         <div>
           <p className="lead">{property.description}</p>
-          <h2>Included on the property</h2>
+          <h2>What this place offers</h2>
           <ul className="amenity-list">
             {property.amenities.map((amenity) => (
               <li key={amenity}>{amenity}</li>
             ))}
           </ul>
-          <h2>On the map</h2>
+          <h2>Where you’ll be</h2>
+          <p className="muted">{property.city}</p>
           <div className="map-panel single">
             <PropertyMap properties={[property]} stay={stay} />
           </div>
         </div>
-        <aside className="book-panel">
-          <h2>Choose a room</h2>
-          <p>
-            {nights > 0
-              ? `${nights} night${nights === 1 ? '' : 's'} · ${stay.guests} guest${stay.guests === 1 ? '' : 's'}`
-              : 'Pick valid dates to see a total.'}
+        <aside className="book-panel" id="rooms">
+          <p className="panel-price">
+            <strong>{formatMoney(from)}</strong> night
           </p>
+          <p className="muted">
+            {formatDate(stay.checkIn)} – {formatDate(stay.checkOut)} · {stay.guests}{' '}
+            {stay.guests === 1 ? 'guest' : 'guests'}
+          </p>
+          <h2>Rooms</h2>
           {rooms.length === 0 ? (
-            <p>No room sleeps {stay.guests}. Lower the guest count in search.</p>
+            <p>No room sleeps {stay.guests}. Lower the guest count and search again.</p>
           ) : (
             rooms.map((room) => (
-              <article key={room.id}>
-                <h3>{room.name}</h3>
-                <p>{room.description}</p>
-                <p>Sleeps {room.sleeps}</p>
-                <p className="price">
-                  {formatMoney(room.price)} <span>/ night</span>
-                </p>
-                {nights > 0 ? <p>Stay total {formatMoney(room.price * nights)}. No booking fee.</p> : null}
-                <Link
-                  className="button"
-                  to={`/book/${property.id}/${room.id}?${searchParams(stay).toString()}`}
-                >
-                  Book this room
-                </Link>
+              <article key={room.id} className="room">
+                <div>
+                  <h3>{room.name}</h3>
+                  <p>{room.description}</p>
+                  <p className="muted">Sleeps {room.sleeps}</p>
+                </div>
+                <div className="room-buy">
+                  <p className="price">
+                    <strong>{formatMoney(room.price)}</strong> night
+                  </p>
+                  {nights > 0 ? (
+                    <p className="muted">
+                      {formatMoney(room.price * nights)} for {nights} nights · no fee
+                    </p>
+                  ) : null}
+                  <Link to={`/book/${property.id}/${room.id}?${searchParams(stay).toString()}`}>
+                    Reserve
+                  </Link>
+                </div>
               </article>
             ))
           )}
         </aside>
+      </div>
+
+      <div className="reserve-bar">
+        <div>
+          <strong>{formatMoney(from)}</strong>
+          <span> night · {nights > 0 ? `${nights} nights` : 'select dates'}</span>
+        </div>
+        <a href="#rooms">Choose a room</a>
       </div>
     </main>
   )

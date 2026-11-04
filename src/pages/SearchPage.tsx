@@ -10,7 +10,7 @@ export function SearchPage() {
   const stay = readSearch(params)
   const [kind, setKind] = useState<'all' | 'hotel' | 'lodge'>('all')
   const [maxPrice, setMaxPrice] = useState(450)
-  const [showMap, setShowMap] = useState(true)
+  const [mapOpen, setMapOpen] = useState(false)
 
   const results = useMemo(() => {
     const needle = stay.destination.trim().toLowerCase()
@@ -24,18 +24,20 @@ export function SearchPage() {
   }, [stay.destination, stay.guests, kind, maxPrice])
 
   return (
-    <main className="search-page">
+    <main className={mapOpen ? 'search-page map-open' : 'search-page'}>
       <SearchForm key={params.toString()} initial={stay} compact />
       <div className="filters">
-        <label>
-          Type
-          <select value={kind} onChange={(event) => setKind(event.target.value as typeof kind)}>
-            <option value="all">Hotels and lodges</option>
-            <option value="hotel">Hotels</option>
-            <option value="lodge">Lodges</option>
-          </select>
-        </label>
-        <label>
+        {(['all', 'hotel', 'lodge'] as const).map((value) => (
+          <button
+            key={value}
+            type="button"
+            className={kind === value ? 'chip on' : 'chip'}
+            onClick={() => setKind(value)}
+          >
+            {value === 'all' ? 'All stays' : value === 'hotel' ? 'Hotels' : 'Lodges'}
+          </button>
+        ))}
+        <label className="price-filter">
           Up to {formatMoney(maxPrice)}
           <input
             type="range"
@@ -46,19 +48,16 @@ export function SearchPage() {
             onChange={(event) => setMaxPrice(Number(event.target.value))}
           />
         </label>
-        <button type="button" className="ghost" onClick={() => setShowMap((open) => !open)}>
-          {showMap ? 'Hide map' : 'Show map'}
-        </button>
       </div>
 
-      <div className={showMap ? 'results with-map' : 'results'}>
+      <div className="results">
         <div>
           <p className="count">
-            {results.length} {results.length === 1 ? 'stay' : 'stays'} for {stay.guests}{' '}
+            {results.length} {results.length === 1 ? 'stay' : 'stays'} · {stay.guests}{' '}
             {stay.guests === 1 ? 'guest' : 'guests'}
           </p>
           {results.length === 0 ? (
-            <p className="empty">Nothing matches those filters. Widen the price or clear the place name.</p>
+            <p className="empty">Nothing matches. Raise the price or clear the place name.</p>
           ) : (
             <div className="result-list">
               {results.map((property) => (
@@ -69,27 +68,33 @@ export function SearchPage() {
                 >
                   <img src={property.images[0]} alt="" />
                   <div>
-                    <p className="kind">{property.kind}</p>
+                    <p className="muted">
+                      {property.kind} · {property.area}
+                    </p>
                     <h2>{property.name}</h2>
-                    <p>{property.summary}</p>
-                    <p className="meta">
-                      {property.area} · {property.rating.toFixed(1)} · {property.reviews} reviews
-                    </p>
-                    <p className="price">
-                      From {formatMoney(fromPrice(property))} <span>/ night</span>
-                    </p>
+                    <p className="summary">{property.summary}</p>
+                    <div className="card-top">
+                      <p className="price">
+                        <strong>{formatMoney(fromPrice(property))}</strong> night
+                      </p>
+                      <span className="rating">★ {property.rating.toFixed(1)}</span>
+                    </div>
                   </div>
                 </Link>
               ))}
             </div>
           )}
         </div>
-        {showMap ? (
-          <div className="map-panel">
-            <PropertyMap properties={results} stay={stay} />
-          </div>
-        ) : null}
+        <div className="map-panel">
+          <button type="button" className="map-close" onClick={() => setMapOpen(false)}>
+            Show list
+          </button>
+          <PropertyMap properties={results} stay={stay} />
+        </div>
       </div>
+      <button type="button" className="map-fab" onClick={() => setMapOpen(true)}>
+        Map
+      </button>
     </main>
   )
 }

@@ -29,11 +29,11 @@ export function SearchForm({ initial, compact = false }: Props) {
 
   return (
     <form className={compact ? 'search compact' : 'search'} onSubmit={submit}>
-      <label>
+      <label className="where">
         <span>Where</span>
         <input
           value={query.destination}
-          placeholder="Victoria Falls, Hwange, Harare…"
+          placeholder="Search hotels and lodges"
           onChange={(event) => update('destination', event.target.value)}
         />
       </label>
@@ -56,17 +56,29 @@ export function SearchForm({ initial, compact = false }: Props) {
           required
         />
       </label>
-      <label>
+      <label className="guests">
         <span>Guests</span>
-        <input
-          type="number"
-          min={1}
-          max={8}
-          value={query.guests}
-          onChange={(event) => update('guests', Number(event.target.value))}
-        />
+        <div className="stepper">
+          <button
+            type="button"
+            aria-label="Fewer guests"
+            onClick={() => update('guests', Math.max(1, query.guests - 1))}
+          >
+            −
+          </button>
+          <strong>{query.guests}</strong>
+          <button
+            type="button"
+            aria-label="More guests"
+            onClick={() => update('guests', Math.min(8, query.guests + 1))}
+          >
+            +
+          </button>
+        </div>
       </label>
-      <button type="submit">Search stays</button>
+      <button className="search-go" type="submit">
+        Search
+      </button>
       {error ? <p className="form-error">{error}</p> : null}
     </form>
   )

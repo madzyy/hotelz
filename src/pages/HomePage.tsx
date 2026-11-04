@@ -3,36 +3,46 @@ import { SearchForm } from '../components/SearchForm'
 import { properties, fromPrice } from '../data/properties'
 import { defaultStay, formatMoney, searchParams } from '../lib/stay'
 
-const places = ['Victoria Falls', 'Hwange', 'Kariba', 'Harare', 'Nyanga', 'Bulawayo']
-
 export function HomePage() {
   const stay = defaultStay()
 
   return (
-    <main>
-      <section className="hero">
+    <main className="home">
+      <section className="home-intro">
         <div className="hero-copy">
-          <p className="eyebrow">Direct from the group</p>
-          <h1>Hotels and lodges, booked without the commission.</h1>
-          <p>
-            Hotelz is the company’s own stay site. Search the properties we actually operate, see them on the map,
-            and pay the house rate.
-          </p>
+          <p className="eyebrow">Book direct</p>
+          <h1>Stay with the group. Skip the booking fee.</h1>
+          <p>Search the hotels and lodges we operate, then reserve at the house rate.</p>
         </div>
-        <SearchForm initial={stay} />
+        <figure className="hero-frame">
+          <img
+            src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=2000&q=80"
+            alt="Hotel pool and rooms in warm evening light"
+          />
+        </figure>
       </section>
+      <SearchForm initial={stay} />
 
       <section className="section">
         <div className="section-head">
-          <h2>Where we host</h2>
-          <Link to="/search">Browse the map</Link>
+          <h2>Places we host</h2>
         </div>
-        <div className="chips">
-          {places.map((place) => (
-            <Link key={place} to={`/search?${searchParams({ ...stay, destination: place }).toString()}`}>
-              {place}
+        <div className="place-row">
+          {properties.map((property) => (
+            <Link
+              key={property.id}
+              className="place"
+              to={`/search?${searchParams({ ...stay, destination: property.city }).toString()}`}
+            >
+              <img src={property.images[0]} alt="" />
+              <span>{property.city}</span>
             </Link>
           ))}
+        </div>
+
+        <div className="section-head">
+          <h2>Hotels and lodges</h2>
+          <Link to="/search">See all</Link>
         </div>
         <div className="card-grid">
           {properties.map((property) => (
@@ -42,12 +52,14 @@ export function HomePage() {
               to={`/stay/${property.id}?${searchParams(stay).toString()}`}
             >
               <img src={property.images[0]} alt="" />
-              <div>
-                <p className="kind">{property.kind}</p>
-                <h3>{property.name}</h3>
-                <p>{property.area}</p>
+              <div className="card-body">
+                <div className="card-top">
+                  <h3>{property.name}</h3>
+                  <span className="rating">★ {property.rating.toFixed(1)}</span>
+                </div>
+                <p className="muted">{property.area}</p>
                 <p className="price">
-                  From {formatMoney(fromPrice(property))} <span>/ night</span>
+                  <strong>{formatMoney(fromPrice(property))}</strong> night
                 </p>
               </div>
             </Link>
