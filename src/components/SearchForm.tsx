@@ -27,16 +27,15 @@ export function SearchForm({ initial, compact = false }: Props) {
     navigate(`/search?${searchParams(query).toString()}`)
   }
 
+  const nights = nightsBetween(query.checkIn, query.checkOut)
+
   return (
     <form className={compact ? 'search compact' : 'search'} onSubmit={submit}>
-      <label className="where">
-        <span>Where</span>
-        <input
-          value={query.destination}
-          placeholder="Fairview, Lusaka"
-          onChange={(event) => update('destination', event.target.value)}
-        />
-      </label>
+      <div className="stay-lock">
+        <span>Stay</span>
+        <strong>Two-bedroom apartment</strong>
+        <small>{nights > 0 ? `${nights} night${nights === 1 ? '' : 's'} · Fairview` : 'Pick your dates'}</small>
+      </div>
       <label>
         <span>Check-in</span>
         <input
@@ -77,7 +76,7 @@ export function SearchForm({ initial, compact = false }: Props) {
         </div>
       </label>
       <button className="search-go" type="submit">
-        Search
+        Check dates
       </button>
       {error ? <p className="form-error">{error}</p> : null}
     </form>

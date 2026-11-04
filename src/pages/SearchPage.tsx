@@ -12,14 +12,10 @@ export function SearchPage() {
   const [mapOpen, setMapOpen] = useState(false)
 
   const results = useMemo(() => {
-    const needle = stay.destination.trim().toLowerCase()
-    return properties.filter((property) => {
-      const text = `${property.name} ${property.city} ${property.area}`.toLowerCase()
-      const matchesPlace = !needle || text.includes(needle)
-      const fitsGuests = property.rooms.some((room) => room.sleeps >= stay.guests && room.price <= maxPrice)
-      return matchesPlace && fitsGuests
-    })
-  }, [stay.destination, stay.guests, maxPrice])
+    return properties.filter((property) =>
+      property.rooms.some((room) => room.sleeps >= stay.guests && room.price <= maxPrice),
+    )
+  }, [stay.guests, maxPrice])
 
   return (
     <main className={mapOpen ? 'search-page map-open' : 'search-page'}>
@@ -61,7 +57,7 @@ export function SearchPage() {
                       {property.kind} · {property.area}
                     </p>
                     <h2>{property.name}</h2>
-                    <p className="summary">{property.summary}</p>
+                    <p className="result-summary">{property.summary}</p>
                     <div className="card-top">
                       <p className="price">
                         <strong>{formatMoney(fromPrice(property))}</strong> night

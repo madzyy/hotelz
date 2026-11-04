@@ -10,7 +10,6 @@ export function defaultStay(): SearchQuery {
   const checkOut = new Date(checkIn)
   checkOut.setDate(checkOut.getDate() + 2)
   return {
-    destination: '',
     checkIn: iso(checkIn),
     checkOut: iso(checkOut),
     guests: 2,
@@ -44,7 +43,6 @@ export function readSearch(params: URLSearchParams): SearchQuery {
   const fallback = defaultStay()
   const guests = Number(params.get('guests') ?? fallback.guests)
   return {
-    destination: params.get('destination') ?? '',
     checkIn: params.get('checkIn') || fallback.checkIn,
     checkOut: params.get('checkOut') || fallback.checkOut,
     guests: Number.isFinite(guests) && guests > 0 ? guests : fallback.guests,
@@ -53,7 +51,6 @@ export function readSearch(params: URLSearchParams): SearchQuery {
 
 export function searchParams(query: SearchQuery) {
   const params = new URLSearchParams()
-  if (query.destination.trim()) params.set('destination', query.destination.trim())
   params.set('checkIn', query.checkIn)
   params.set('checkOut', query.checkOut)
   params.set('guests', String(query.guests))

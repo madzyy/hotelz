@@ -26,7 +26,6 @@ export type Property = {
 }
 
 export type SearchQuery = {
-  destination: string
   checkIn: string
   checkOut: string
   guests: number
