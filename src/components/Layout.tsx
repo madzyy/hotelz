@@ -43,6 +43,9 @@ export function Layout() {
       <footer className="site-footer">
         <strong>Kipling Court</strong>
         <p>Direct bookings for the Fairview apartment. Apartment 3, Ituna Road, Lusaka.</p>
+        <p>
+          <a href="/present">Journey slideshow</a>
+        </p>
       </footer>
       <nav className="tabbar">
         <NavLink to="/" end>

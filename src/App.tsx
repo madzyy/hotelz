@@ -4,11 +4,13 @@ import { BookPage } from './pages/BookPage'
 import { HomePage } from './pages/HomePage'
 import { SearchPage } from './pages/SearchPage'
 import { StayPage } from './pages/StayPage'
+import { PresentPage } from './pages/PresentPage'
 import { TripsPage } from './pages/TripsPage'
 
 export default function App() {
   return (
     <Routes>
+      <Route path="present" element={<PresentPage />} />
       <Route element={<Layout />}>
         <Route index element={<HomePage />} />
         <Route path="search" element={<SearchPage />} />

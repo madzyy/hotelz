@@ -46,6 +46,7 @@ export function TripsPage() {
                   <p className="muted">
                     {formatDate(booking.checkIn)} – {formatDate(booking.checkOut)} · {booking.nights} nights
                   </p>
+                  {booking.payWith ? <p className="muted">{booking.payWith}</p> : null}
                   <p className="price">
                     <strong>{formatMoney(booking.total)}</strong> total
                   </p>

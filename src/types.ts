@@ -42,6 +42,7 @@ export type Booking = {
   email: string
   phone: string
   notes: string
+  payWith?: string
   nights: number
   total: number
   createdAt: string

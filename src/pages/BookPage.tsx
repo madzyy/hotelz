@@ -1,8 +1,16 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { AirtelMark, ChipMark, MastercardMark, MtnMark, VisaMark } from '../components/PayMarks'
 import { getProperty } from '../data/properties'
 import { saveBooking } from '../lib/bookings'
 import { formatDate, formatMoney, nightsBetween, readSearch } from '../lib/stay'
+
+function prettyCard(value: string) {
+  return value
+    .replace(/\D/g, '')
+    .slice(0, 16)
+    .replace(/(\d{4})(?=\d)/g, '$1 ')
+}
 
 export function BookPage() {
   const { propertyId, roomId } = useParams()
@@ -16,6 +24,12 @@ export function BookPage() {
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [notes, setNotes] = useState('')
+  const [payWith, setPayWith] = useState<'visa' | 'mastercard' | 'airtel' | 'mtn'>('visa')
+  const [cardName, setCardName] = useState('')
+  const [cardNumber, setCardNumber] = useState('')
+  const [expiry, setExpiry] = useState('')
+  const [cvc, setCvc] = useState('')
+  const [momoPhone, setMomoPhone] = useState('')
   const [error, setError] = useState('')
 
   if (!property || !room) {
@@ -36,6 +50,23 @@ export function BookPage() {
       setError('Those dates do not make a stay.')
       return
     }
+    const card = payWith === 'visa' || payWith === 'mastercard'
+    if (card) {
+      const digits = cardNumber.replace(/\s/g, '')
+      if (cardName.trim().length < 2 || digits.length < 15 || !/^\d{2}\/\d{2}$/.test(expiry) || cvc.length < 3) {
+        setError('Fill the demo card fields. Nothing is charged or stored.')
+        return
+      }
+    } else if (momoPhone.trim().length < 9) {
+      setError('Enter the mobile-money number for this demo.')
+      return
+    }
+    const labels = {
+      visa: 'Visa (demo)',
+      mastercard: 'Mastercard (demo)',
+      airtel: 'Airtel Money (demo)',
+      mtn: 'MTN Mobile Money (demo)',
+    }
     const booking = {
       id: crypto.randomUUID(),
       propertyId: property.id,
@@ -47,6 +78,7 @@ export function BookPage() {
       email: email.trim(),
       phone: phone.trim(),
       notes: notes.trim(),
+      payWith: labels[payWith],
       nights,
       total: room.price * nights,
       createdAt: new Date().toISOString(),
@@ -63,8 +95,8 @@ export function BookPage() {
         </Link>
         <ol className="steps">
           <li className="done">Trip</li>
-          <li className="current">Your details</li>
-          <li>Confirm</li>
+          <li className="current">Pay</li>
+          <li>Done</li>
         </ol>
         <h1>Confirm and book</h1>
       </div>
@@ -88,6 +120,80 @@ export function BookPage() {
             Message to the property
             <textarea value={notes} onChange={(event) => setNotes(event.target.value)} rows={4} placeholder="Arrival time, extra bed, celebration…" />
           </label>
+          <h2>How you’ll pay</h2>
+          <p className="fine">Demo checkout. Pick a card or Zambian mobile money. Nothing is charged.</p>
+          <div className="pay-grid">
+            <button type="button" className={payWith === 'visa' ? 'pay on' : 'pay'} onClick={() => setPayWith('visa')}>
+              <VisaMark />
+              Visa
+            </button>
+            <button type="button" className={payWith === 'mastercard' ? 'pay on' : 'pay'} onClick={() => setPayWith('mastercard')}>
+              <MastercardMark />
+              Mastercard
+            </button>
+            <button type="button" className={payWith === 'airtel' ? 'pay on' : 'pay'} onClick={() => setPayWith('airtel')}>
+              <AirtelMark />
+              Airtel Money
+            </button>
+            <button type="button" className={payWith === 'mtn' ? 'pay on' : 'pay'} onClick={() => setPayWith('mtn')}>
+              <MtnMark />
+              MTN MoMo
+            </button>
+          </div>
+          {payWith === 'visa' || payWith === 'mastercard' ? (
+            <>
+              <div className={payWith === 'visa' ? 'plastic visa' : 'plastic master'}>
+                <div className="plastic-top">
+                  <ChipMark />
+                  {payWith === 'visa' ? <VisaMark /> : <MastercardMark />}
+                </div>
+                <p className="plastic-num">{prettyCard(cardNumber) || '•••• •••• •••• ••••'}</p>
+                <div className="plastic-bottom">
+                  <span>{cardName.trim() || 'Name on card'}</span>
+                  <span>{expiry || 'MM/YY'}</span>
+                </div>
+              </div>
+              <label>
+                Name on card
+                <input value={cardName} onChange={(event) => setCardName(event.target.value)} autoComplete="off" />
+              </label>
+              <label>
+                Card number
+                <input
+                  inputMode="numeric"
+                  placeholder="ACCT-000015"
+                  value={prettyCard(cardNumber)}
+                  onChange={(event) => setCardNumber(event.target.value)}
+                  autoComplete="off"
+                />
+              </label>
+              <div className="split-fields">
+                <label>
+                  Expiry
+                  <input placeholder="MM/YY" value={expiry} onChange={(event) => setExpiry(event.target.value)} autoComplete="off" />
+                </label>
+                <label>
+                  CVC
+                  <input inputMode="numeric" placeholder="123" value={cvc} onChange={(event) => setCvc(event.target.value)} autoComplete="off" />
+                </label>
+              </div>
+            </>
+          ) : (
+            <div className={payWith === 'airtel' ? 'wallet airtel' : 'wallet mtn'}>
+              <div className="wallet-brand">{payWith === 'airtel' ? <AirtelMark /> : <MtnMark />}</div>
+              <p>Pay from your {payWith === 'airtel' ? 'Airtel Money' : 'MTN MoMo'} wallet</p>
+              <label>
+                {payWith === 'airtel' ? 'Airtel number' : 'MTN number'}
+                <input
+                  inputMode="tel"
+                  placeholder="097…"
+                  value={momoPhone}
+                  onChange={(event) => setMomoPhone(event.target.value)}
+                  autoComplete="off"
+                />
+              </label>
+            </div>
+          )}
           {error ? <p className="form-error">{error}</p> : null}
           <button className="desk-submit" type="submit" disabled={nights < 1}>
             Confirm booking · {formatMoney(total)}
@@ -96,7 +202,11 @@ export function BookPage() {
         </section>
 
         <aside className="summary">
-          <img src={property.images[0]} alt="" />
+          <div className="summary-film">
+            {property.images.slice(0, 3).map((image) => (
+              <img key={image} src={image} alt="" />
+            ))}
+          </div>
           <div>
             <p className="muted">{property.kind} · {property.area}</p>
             <h2>{property.name}</h2>
