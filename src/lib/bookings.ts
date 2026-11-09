@@ -14,7 +14,7 @@ export function loadBookings(): Booking[] {
 }
 
 export function saveBooking(booking: Booking) {
-  const next = [booking, ...loadBookings()]
+  const next = [booking]
   localStorage.setItem(KEY, JSON.stringify(next))
   return next
 }

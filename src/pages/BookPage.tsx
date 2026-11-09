@@ -12,6 +12,12 @@ function prettyCard(value: string) {
     .replace(/(\d{4})(?=\d)/g, '$1 ')
 }
 
+function prettyExpiry(value: string) {
+  const digits = value.replace(/\D/g, '').slice(0, 4)
+  if (digits.length <= 2) return digits
+  return `${digits.slice(0, 2)}/${digits.slice(2)}`
+}
+
 export function BookPage() {
   const { propertyId, roomId } = useParams()
   const [params] = useSearchParams()
@@ -53,7 +59,7 @@ export function BookPage() {
     const card = payWith === 'visa' || payWith === 'mastercard'
     if (card) {
       const digits = cardNumber.replace(/\s/g, '')
-      if (cardName.trim().length < 2 || digits.length < 15 || !/^\d{2}\/\d{2}$/.test(expiry) || cvc.length < 3) {
+      if (cardName.trim().length < 2 || digits.length < 15 || !/^\d{2}\/\d{2}$/.test(prettyExpiry(expiry)) || cvc.replace(/\D/g, '').length < 3) {
         setError('Fill the demo card fields. Nothing is charged or stored.')
         return
       }
@@ -170,7 +176,14 @@ export function BookPage() {
               <div className="split-fields">
                 <label>
                   Expiry
-                  <input placeholder="MM/YY" value={expiry} onChange={(event) => setExpiry(event.target.value)} autoComplete="off" />
+                  <input
+                    placeholder="MM/YY"
+                    inputMode="numeric"
+                    maxLength={5}
+                    value={expiry}
+                    onChange={(event) => setExpiry(prettyExpiry(event.target.value))}
+                    autoComplete="off"
+                  />
                 </label>
                 <label>
                   CVC

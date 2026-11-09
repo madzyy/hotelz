@@ -1,0 +1,60 @@
+/* ===================================================================
+   THEME TOKENS — edit ONLY this :root block to re-theme the whole deck.
+   The SAME token vocabulary as the `slides` (Slidev) and `webdeck` skills,
+   so a brand looks identical across all of them. The values below are a
+   "dark product" default — REPLACE them to match the brief or the brand.
+   =================================================================== */
+:root {
+  /* Surfaces — Kipling Court site: paper #f6f4ef, card #fffcf7 */
+  --bg: #f6f4ef;
+  --bg-grad-1: rgba(14, 107, 98, 0.045);
+  --bg-grad-2: rgba(228, 223, 212, 0.1);
+  --surface: rgba(255, 252, 247, 0.96);
+  --surface-2: rgba(255, 252, 247, 0.98);
+
+  /* Ink — solid on the paper, not washed gray */
+  --fg: #1a2421;
+  --fg-muted: #2c3a37;
+  --fg-faint: #3e4c48;
+
+  /* Hairlines — site --line #e4dfd4 */
+  --hair: rgba(26, 36, 33, 0.12);
+  --hair-2: rgba(26, 36, 33, 0.06);
+
+  /* Accent — site --accent #0e6b62, one teal family */
+  --primary: #0e6b62;
+  --accent: linear-gradient(
+    115deg,
+    #0b5c54 0%,
+    #0e6b62 46%,
+    #1a8f84 100%
+  );
+  --accent-ink: #f6f4ef;
+
+  /* Radius — the site uses 12–18px cards */
+  --radius: 18px;
+  --radius-sm: 12px;
+  --radius-lg: 22px;
+
+  /* Depth */
+  --shadow: 0 30px 70px -36px rgba(26, 36, 33, 0.28);
+  --glow: 0 24px 60px -28px rgba(14, 107, 98, 0.4);
+
+  /* Type — Plus Jakarta Sans, same family as the live site */
+  --font-head: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+  --font-body: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Motion */
+  --dur: 0.4s;
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Atmosphere */
+  --grain: 0.015;
+  --vignette: rgba(26, 36, 33, 0.03);
+
+  /* Responsive gutter — fluid side / vertical padding */
+  --gutter: clamp(28px, 6vw, 120px);
+  --gutter-y: clamp(40px, 8vh, 96px);
+}

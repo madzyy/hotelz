@@ -8,54 +8,92 @@ export function TripsPage() {
   const [params] = useSearchParams()
   const confirmed = params.get('confirmed')
   const [bookings] = useState(() => loadBookings())
-  const justBooked = bookings.find((booking) => booking.id === confirmed)
+  const booking = bookings.find((item) => item.id === confirmed) ?? bookings[0]
+  const property = booking ? getProperty(booking.propertyId) : undefined
+  const room = property?.rooms.find((item) => item.id === booking?.roomId)
 
-  return (
-    <main className="section trips">
-      <h1>{justBooked ? 'You’re booked' : 'Trips'}</h1>
-      {justBooked ? (
-        <p className="banner">
-          {justBooked.guestName}, {getProperty(justBooked.propertyId)?.name ?? 'the property'} has this stay. Show this
-          screen at check-in.
-        </p>
-      ) : (
-        <p className="muted">Reservations saved on this phone or computer.</p>
-      )}
-      {bookings.length === 0 ? (
+  if (!booking || !property) {
+    return (
+      <main className="section">
         <div className="empty">
-          <h2>No trips yet</h2>
-          <p>When you confirm a stay, it shows up here.</p>
+          <h1>No booking yet</h1>
+          <p>Confirm a stay to see the receipt here.</p>
           <Link className="button" to="/search">
-            Start a search
+            Check dates
           </Link>
         </div>
-      ) : (
-        <div className="trip-list">
-          {bookings.map((booking) => {
-            const property = getProperty(booking.propertyId)
-            const room = property?.rooms.find((item) => item.id === booking.roomId)
-            return (
-              <article key={booking.id} className={booking.id === confirmed ? 'trip fresh' : 'trip'}>
-                {property ? <img src={property.images[0]} alt="" /> : null}
-                <div>
-                  <p className="muted">{booking.id === confirmed ? 'Confirmed' : 'Upcoming'}</p>
-                  <h2>{property?.name ?? 'Property'}</h2>
-                  <p>
-                    {room?.name ?? 'Room'} · {booking.guests} guests
-                  </p>
-                  <p className="muted">
-                    {formatDate(booking.checkIn)} – {formatDate(booking.checkOut)} · {booking.nights} nights
-                  </p>
-                  {booking.payWith ? <p className="muted">{booking.payWith}</p> : null}
-                  <p className="price">
-                    <strong>{formatMoney(booking.total)}</strong> total
-                  </p>
-                </div>
-              </article>
-            )
-          })}
+      </main>
+    )
+  }
+
+  const code = booking.id.slice(0, 8).toUpperCase()
+
+  return (
+    <main className="section confirm">
+      <p className="confirm-badge">Confirmed</p>
+      <h1>You’re booked</h1>
+      <p className="lead">
+        {booking.guestName}, Kipling Court is holding the apartment. Show this screen at check-in.
+      </p>
+
+      <article className="ticket">
+        <div className="ticket-photos">
+          {property.images.slice(0, 3).map((image) => (
+            <img key={image} src={image} alt="" />
+          ))}
         </div>
-      )}
+        <div className="ticket-body">
+          <div className="ticket-head">
+            <div>
+              <p className="eyebrow">Fairview, Lusaka</p>
+              <h2>{property.name}</h2>
+              <p className="muted">
+                {room?.name} · {booking.guests} {booking.guests === 1 ? 'guest' : 'guests'}
+              </p>
+            </div>
+            <p className="ref">
+              Ref
+              <strong>{code}</strong>
+            </p>
+          </div>
+          <div className="ticket-dates">
+            <div>
+              <span>Check-in</span>
+              <strong>{formatDate(booking.checkIn)}</strong>
+              <p>From 15:00</p>
+            </div>
+            <div>
+              <span>Check-out</span>
+              <strong>{formatDate(booking.checkOut)}</strong>
+              <p>By 10:00</p>
+            </div>
+          </div>
+          <dl className="totals">
+            <div>
+              <dt>
+                {booking.nights} {booking.nights === 1 ? 'night' : 'nights'}
+              </dt>
+              <dd>{formatMoney(booking.total)}</dd>
+            </div>
+            <div>
+              <dt>Paid with</dt>
+              <dd>{booking.payWith ?? 'Demo'}</dd>
+            </div>
+            <div className="grand">
+              <dt>Total</dt>
+              <dd>{formatMoney(booking.total)}</dd>
+            </div>
+          </dl>
+          <div className="ticket-actions">
+            <Link className="button" to={`/stay/${property.id}`}>
+              View the apartment
+            </Link>
+            <Link className="ghost" to="/present">
+              Journey slideshow
+            </Link>
+          </div>
+        </div>
+      </article>
     </main>
   )
 }
